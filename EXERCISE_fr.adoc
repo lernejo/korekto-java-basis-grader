@@ -1,0 +1,380 @@
+= Vérification des bases en Java
+
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+endif::[]
+:hardbreaks-option:
+
+Préfixé par ✔️, des "checkpoints" pour vous aider à vérifier que vous avez tout bon.
+
+== Objectif
+
+Se rafraichir la mémoire sur l'utilisation des outils de bases : Git, Maven & JUnit.
+
+== Prérequis
+
+* Git
+* (Optionnel, mais fortement recommandé) IntelliJ edition _community_ 2024
+* Java 21 (installation ultérieur avec IntelliJ)
+* Maven 3.9.x (pas nécessaire avec IntelliJ)
+
+---
+
+* Créer un nouveau repository GitHub en allant sur la page : https://github.com/new
+* ⚠️ Renseigner comme nom de dépôt : *java_basis_training*
+* ⚠️ Marquer le futur dépôt comme *private*
+* Une fois le dépôt créé, installer l'app https://github.com/apps/korekto[Korekto]
+
+== Partie 1
+
+Initialisation du repo Git
+
+* Dans votre IDE préféré (IntelliJ), créer un nouveau projet Maven
+** File -> New -> Project -> Java -> Name: java_basis_training -> Build system: Maven -> JDK: Temurin-21
+* ✔️ Vous pouvez constater la présence d'un fichier `pom.xml` à la racine de votre projet
+* A la racine du projet, initialiser le repo Git : `git init`
+* Puis référencer l'URL remote : `git remote add origin $REMOTE_URL`
+* ✔️ Vous pouvez trouver l'URL de votre repository dans l'interface de GitHub : image:img/code_button.png[Code button]
+* Ajouter un fichier `README.md` contenant un titre et une courte description
+* Créer un fichier `.editorconfig` avec le contenu suivant
+
+[source,ini]
+----
+root = true
+
+[*]
+end_of_line = lf
+insert_final_newline = true
+
+charset = utf-8
+
+indent_style = space
+indent_size = 4
+----
+
+.A quoi ça sert ?
+[%collapsible]
+====
+
+[TIP]
+=====
+Ce fichier est reconnu par un grand nombre d'IDE (IntelliJ, Eclipse, VS code, etc.) et va permettre de ne pas avoir à se soucier
+
+* Du type d'indentation (ici 4 espaces)
+* De l'encodage (ici UTF-8)
+* Du type de fin de ligne (ici `LF`)
+* De la ligne vide à la fin de chaque fichier (bonne pratique Git)
+
+Pour plus d'information : https://editorconfig.org/
+=====
+====
+
+* Ajouter un fichier `.gitignore` à la racine du dépôt avec le contenu suivant
+
+[source,gitignore]
+----
+# Maven
+target/
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# Mac OS
+.DS_Store
+
+----
+
+.A quoi ça sert ?
+[%collapsible]
+====
+
+[TIP]
+=====
+
+Ce fichier (**.gitignore**) est reconnu par Git afin d'ignorer les changements des fichiers correspondants.
+Dans notre cas, les fichiers que génère IntelliJ ne sont pas nécessaires car :
+
+* un autre IDE (Eclipse, VS code, etc.) n'en aura pas besoin
+* le build automatique (CI) n'en a pas besoin
+* le projet peut donc être construit sans
+=====
+====
+
+* Ajouter les différents fichiers créés à l'index Git : `git add ...`
+* Faire un commit contenant ces fichiers avec le message **Setup project layout** : `git commit -m "Setup project layout"`
+* Pousser ce nouveau commit sur votre remote par défaut, en l'occurrence GitHub : `git push`
+* ✔️ Vérifier que les fichiers apparaissent bien dans l'interface web de GitHub
+
+== Partie 2 - Maven
+
+Maven est outil qui gère le cycle de vie d'un projet Java (ou d'autres languages sur la JVM par extension).
+Le point d'entrée dans un projet pour Maven est le fichier descripteur du projet appelé `pom.xml`.
+Pour un projet Java, Maven s'attend à trouver le code de production dans le répertoire `src/main/java` et le code de test dans `src/test/java`.
+Tous les fichiers générés par Maven seront placés dans le répertoire `target`.
+
+* Vérifier que le fichier `pom.xml` contient bien les propriétés suivantes, et sinon les ajouter :
+
+
+[source,xml]
+----
+<properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <maven.compiler.source>21</maven.compiler.source>
+    <maven.compiler.target>21</maven.compiler.target>
+</properties>
+----
+
+* créer un fichier **Sample.java** dans le répertoire **src/main/java/fr/lernejo** avec le contenu suivant
+
+[source,java]
+----
+package fr.lernejo;
+
+import java.util.function.BiFunction;
+
+public class Sample {
+
+    public int op(Operation op, int a, int b) {
+        return op.func.apply(a, b);
+    }
+
+    public int fact(int n) {
+        if (n < 0) {
+            throw new IllegalArgumentException("N should be positive");
+        }
+        return n == 0 ? 1 : n * fact(n - 1);
+    }
+
+    enum Operation {
+        ADD((a, b) -> a + b),
+        MULT((a, b) -> a * b),
+        ;
+
+        final BiFunction<Integer, Integer, Integer> func;
+
+        Operation(BiFunction<Integer, Integer, Integer> func) {
+            this.func = func;
+        }
+    }
+}
+
+----
+
+* Lancer la commande `mvn compile`
+* ✔️ La classe compilée **Sample.class** correspondante a été générée dans `target/classes/fr/lernejo`
+* Faire un commit contenant ces changements avec le message "My first class" et le pousser vers GitHub
+
+== Partie 3 - CI
+
+
+L'intégration continue (CI pour Continuous Integration) est un service attaché au projet permet de lancer les
+différentes étapes de sa construction à chaque fois qu'un changement est apporté.
+
+Dans cet exercice, nous allons utiliser le service proposé par GitHub.
+
+* Se connecter à https://app.codecov.io
+* Synchroniser le repository courant
+* Aller dans Settings -> Global Upload Token -> copier la valeur du token
+* Dans l'interface de GitHub, aller dans les Settings du repo -> Secrets and variables -> Actions -> New repository secret
+* Créer le secret de nom `CODECOV_TOKEN` et utiliser la valeur précédemment copiée
+* Créer un fichier **.github/workflows/build.yml** avec le contenu
+[source,yml]
+----
+name: Build
+
+on: push
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: temurin
+          cache: maven
+
+      - name: Debug JDK setup
+        run: |
+         java -version
+         mvn -version
+         echo $JAVA_HOME
+
+      - name: Launch tests
+        run: mvn verify
+
+      - uses: codecov/codecov-action@v4
+        with:
+          fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}
+          verbose: true
+----
+
+.A quoi ça sert ?
+[%collapsible]
+====
+
+[TIP]
+=====
+Ce fichier (`build.yml`) est reconnu par GitHub et permet de déclencher à chaque *push* une construction du projet
+constituée des étapes suivantes :
+
+* Checkout du code
+* Installation de Java
+* Mise en cache (et récupération) des dépendances Maven du projet
+* Affichage de la version de java installée (pour info)
+* Lancement de la commande `mvn install`
+* Upload du résultat de la couverture des tests sur Codecov
+=====
+====
+
+* Commiter ce fichier avec le message "Setup GitHub CI"
+* &#x1F4D8; Dans l'interface web GitHub de votre projet, dans l'onglet *Actions*, un nouveau workflow démarre et celui-ci doit se finir en succès
+
+== Partie 4 - 100% de couverture de test
+
+* Dans le fichier *pom.xml* ajouter
+* Les quatre properties suivantes
+[source,xml]
+----
+<properties> <!-- balise existante -->
+  ...
+  <junit.version>5.10.3</junit.version>
+  <assertj.version>3.26.3</assertj.version>
+
+  <maven-surefire-plugin.version>3.3.1</maven-surefire-plugin.version>
+  <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
+</properties>
+----
+
+* Les dépendances suivantes
+
+[source,xml]
+----
+<dependencies>
+    <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter</artifactId>
+        <version>${junit.version}</version>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.assertj</groupId>
+        <artifactId>assertj-core</artifactId>
+        <version>${assertj.version}</version>
+        <scope>test</scope>
+    </dependency>
+</dependencies>
+----
+
+* Et les plugins suivants
+
+[source,xml]
+----
+<build>
+    <pluginManagement>
+        <plugins>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco-maven-plugin.version}</version>
+            </plugin>
+        </plugins>
+    </pluginManagement>
+    <plugins>
+        <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <executions>
+                <execution>
+                    <goals>
+                        <goal>prepare-agent</goal>
+                    </goals>
+                </execution>
+                <execution>
+                    <id>report</id>
+                    <phase>test</phase>
+                    <goals>
+                        <goal>report</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+</build>
+----
+
+.A quoi ça sert ?
+[%collapsible]
+====
+
+[TIP]
+=====
+Nous ajoutons au projet les dépendances
+
+* **junit-jupiter**, un framework servant à écrire et lancer des tests
+* **assertj**, une bibliothèque permettant d'écrire des assertions expressives
+
+Par ailleurs, par défaut Maven utilise une version du plugin **surefire** qui ne reconnaît pas **junit-jupiter**, c'est pour ça que nous devons le forcer à une version plus récente.
+Enfin, nous utilisons le plugin **jacoco** afin d'analyser la couverture de code et produire le rapport correspondant.
+=====
+====
+
+
+* Créer le répertoire `src/test/java` (clic droit sur `java_basis_training` -> `New` -> `Directory`) qui va accueillir les classes de test
+* Ouvrir la classe Java *Sample* et créer la classe de test correspondante en utilisant le raccourci (Ctrl + Shift + T)
+ou par le menu `Navigate` -> `Test`
+* Ajouter les tests nécessaires à une couverture du code à 100 %
+
+.Qu'est-ce qu'un test ?
+[%collapsible]
+====
+[TIP]
+=====
+Un test est constitué de trois parties
+
+* les mises en condition initiale (0..n)
+* un élément déclencheur (1)
+* des vérifications sur l'état résultant (1..n)
+
+Exemples :
+[source,java]
+----
+   @Test
+   void dividing_by_zero_should_produce_an_exception() {
+       int dividend = 10;
+       int divisor = 0;
+       Assertions.assertThatExceptionOfType(DivisionByZeroException.class)
+             .isThrownBy(() -> Sample.divide(dividend, divisor));
+   }
+
+   @Test
+   void dividing_10_by_2_should_produce_5() {
+       int dividend = 10; // <1>
+       int divisor = 2;
+       int quotient = Sample.divide(dividend, divisor); // <2>
+       Assertions.assertThat(quotient).as("quotient of 10 / 2")
+             .isEqualTo(5); // <3>
+   }
+----
+<1> Mise en condition initiale : on initialise deux variables
+<2> Élément déclencheur : la méthode `Sample#divide` est appelée
+<3> Vérification : le résultat doit être 5
+
+=====
+====
+
+* Commiter ces changements avec le message "Add tests to match 100% coverage"
+* ✔️ Après la fin du job de CI, Codecov afficher la couverture de 100%
