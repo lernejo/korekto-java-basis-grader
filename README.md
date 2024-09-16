@@ -14,5 +14,6 @@ You will need these 2 env vars:
 
 ```bash
 git clone git@github.com:lernejo/korekto-java-basis-grader.git
+cd korekto-java-basis-grader
 ./mvnw compile exec:java -Dexec.args="-s=$GH_LOGIN" -Dgithub_token="$GH_TOKEN"
 ```
