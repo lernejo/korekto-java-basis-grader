@@ -237,7 +237,7 @@ constituée des étapes suivantes :
 ====
 
 * Commiter ce fichier avec le message "Setup GitHub CI"
-* &#x1F4D8; Dans l'interface web GitHub de votre projet, dans l'onglet *Actions*, un nouveau workflow démarre et celui-ci doit se finir en succès
+* &#x1F4D8; Dans l'interface web GitHub de votre projet, dans l'onglet *Actions*, un nouveau workflow démarre et celui-ci doit se finir avec l'erreur : "Coverage report not found"
 
 == Partie 4 - 100% de couverture de test
 
