@@ -59,8 +59,7 @@ public class BasisGrader implements Grader<LaunchingContext> {
             new Part1Grader("Part 1 - Git History", 4.0D, 0.5D),
             new MavenCompileAndTestPartGrader<>(
                 "Part 2 - Compilation Maven",
-                2.0D,
-                c -> List.of("validate")),
+                2.0D),
             new GitHubActionsPartGrader<>("Part 3 - GitHub CI", 2.0D),
             new JacocoCoveragePartGrader<>("Part 4 - 100% test coverage", 6, 1.0D)
         );
