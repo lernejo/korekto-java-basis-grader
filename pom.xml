@@ -13,7 +13,7 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
 
-        <korekto-toolkit.version>2.0.1</korekto-toolkit.version>
+        <korekto-toolkit.version>2.0.2</korekto-toolkit.version>
         <logback.version>1.5.12</logback.version>
         <juniversalchardet.version>2.5.0</juniversalchardet.version>
         <junit.version>5.11.3</junit.version>
