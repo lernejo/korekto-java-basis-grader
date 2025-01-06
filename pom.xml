@@ -17,7 +17,7 @@
         <logback.version>1.5.12</logback.version>
         <juniversalchardet.version>2.5.0</juniversalchardet.version>
         <junit.version>5.11.4</junit.version>
-        <assertj.version>3.27.0</assertj.version>
+        <assertj.version>3.27.2</assertj.version>
 
         <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>3.5.2</maven-surefire-plugin.version>
