@@ -14,7 +14,7 @@
         <maven.compiler.target>21</maven.compiler.target>
 
         <korekto-toolkit.version>2.0.2</korekto-toolkit.version>
-        <logback.version>1.5.18</logback.version>
+        <logback.version>1.5.19</logback.version>
         <juniversalchardet.version>2.5.0</juniversalchardet.version>
         <junit.version>5.13.4</junit.version>
         <assertj.version>3.27.6</assertj.version>
